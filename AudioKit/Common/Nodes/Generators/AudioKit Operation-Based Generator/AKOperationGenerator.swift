@@ -46,23 +46,27 @@ open class AKOperationGenerator: AKNode, AKToggleable, AKComponent {
     private var customUgens: [AKCustomUgen]
 
     // MARK: - Initializers
+    
+    public convenience init(operation: ([AKOperation]) -> AKComputedParameter) {
+        self.init(operation: operation, customUgens: [])
+    }
 
     /// Initialize with a mono or stereo operation
     ///
     /// - parameter operation: Operation to generate, can be mono or stereo
     ///
-    public convenience init(operation: ([AKOperation]) -> AKComputedParameter) {
+    public convenience init(operation: ([AKOperation]) -> AKComputedParameter, customUgens: [AKCustomUgen]) {
 
         let computedParameter = operation(AKOperation.parameters)
 
         if type(of: computedParameter) == AKOperation.self {
             if let monoOperation = computedParameter as? AKOperation {
-                self.init(sporth: monoOperation.sporth + " dup ")
+                self.init(sporth: monoOperation.sporth + " dup ", customUgens: customUgens)
                 return
             }
         } else {
             if let stereoOperation = computedParameter as? AKStereoOperation {
-                self.init(sporth: stereoOperation.sporth + " swap ")
+                self.init(sporth: stereoOperation.sporth + " swap ", customUgens: customUgens)
                 return
             }
         }
